@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = MainAdapter(movies)
         val rv: RecyclerView = findViewById(R.id.rvMain)
-        rv.layoutManager = LinearLayoutManager(this)
+//        rv.layoutManager = LinearLayoutManager(this) Rolagem na vertical
+        rv.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false) // rolagem na horizontal
         rv.adapter = adapter
     }
 
