@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Netflix Remake</string>
+    <string name="cast">Elenco %1$s</string>
+    <string name="opcoes_semelhantes">Opções Semelhantes</string>
 </resources>
