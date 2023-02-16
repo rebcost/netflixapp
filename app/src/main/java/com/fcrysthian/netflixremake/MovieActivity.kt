@@ -5,16 +5,22 @@ import android.content.Context
 import android.graphics.drawable.LayerDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import co.tiagoaguiar.netflixremake.util.MovieTask
 import com.fcrysthian.netflixremake.adapter.MovieAdapter
 import com.fcrysthian.netflixremake.model.Movie
+import com.fcrysthian.netflixremake.model.MovieDetail
+import com.fcrysthian.netflixremake.util.CategoryTask
 
-class MovieActivity : AppCompatActivity() {
+class MovieActivity : AppCompatActivity(), MovieTask.Callback {
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +32,16 @@ class MovieActivity : AppCompatActivity() {
         val txtCast: TextView = findViewById(R.id.movie_txt_cast)
         val rv : RecyclerView = findViewById(R.id.movie_rv_similar)
 
+        val id = intent?.getIntExtra("id", 0) ?: throw IllegalStateException("Id não foi encontrado")
+
+        val url = "https://api.tiagoaguiar.co/netflixapp/movie/$id?apiKey=9207fe2f-8803-4efc-8fbf-9e643ef62888"
+
+        MovieTask(this).execute(url)
+
         txtTitle.text = "Batman Begins"
         txtDesc.text = "Essa é uma descrição do filme"
         txtCast.text = getString(R.string.cast, "Ator A, Ator B, Atriz A, Atriz B")
+
 
         val movies = mutableListOf<Movie>()
 
@@ -55,5 +68,24 @@ class MovieActivity : AppCompatActivity() {
         coverImg.setImageDrawable(layerDrawable)
 
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home){
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPreExecute() {
+
+    }
+
+    override fun onResult(movieDetail: MovieDetail) {
+        Log.i("teste", movieDetail.toString())
+    }
+
+    override fun onFailure(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
