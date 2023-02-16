@@ -1,5 +1,6 @@
 package com.fcrysthian.netflixremake
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,16 +18,17 @@ import com.fcrysthian.netflixremake.util.CategoryTask
 class MainActivity : AppCompatActivity(), CategoryTask.Callback {
 
     private lateinit var progress: ProgressBar
+    private val categories = mutableListOf<Category>()
+    private lateinit var adapter: CategoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         progress = findViewById(R.id.progress_main)
 
-        val categories = mutableListOf<Category>()
-
-        val adapter = CategoryAdapter(categories)
+        adapter = CategoryAdapter(categories)
         val rv: RecyclerView = findViewById(R.id.rv_main)
 //        rv.layoutManager = LinearLayoutManager(this) Rolagem na vertical
         rv.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false) // rolagem na horizontal
@@ -39,6 +41,9 @@ class MainActivity : AppCompatActivity(), CategoryTask.Callback {
         //
         Log.i("Teste MainActivity", categories.toString())
         Toast.makeText(this, "Conexão estabelecida", Toast.LENGTH_SHORT).show()
+        this.categories.clear()
+        this.categories.addAll(categories)
+        adapter.notifyDataSetChanged() // forca o adapter chamar de novo o onBindViewHolder
         progress.visibility = View.GONE
     }
 
