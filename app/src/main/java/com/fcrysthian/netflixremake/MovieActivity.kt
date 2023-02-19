@@ -1,30 +1,26 @@
 package com.fcrysthian.netflixremake
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import co.tiagoaguiar.netflixremake.util.MovieTask
+import com.fcrysthian.netflixremake.util.MovieTask
 import com.fcrysthian.netflixremake.adapter.MovieAdapter
 import com.fcrysthian.netflixremake.model.Movie
 import com.fcrysthian.netflixremake.model.MovieDetail
-import com.fcrysthian.netflixremake.util.CategoryTask
 import com.fcrysthian.netflixremake.util.DownloadImageTask
-import com.squareup.picasso.Picasso
 
 class MovieActivity : AppCompatActivity(), MovieTask.Callback {
 
@@ -47,9 +43,11 @@ class MovieActivity : AppCompatActivity(), MovieTask.Callback {
         rv = findViewById(R.id.movie_rv_similar)
         progress = findViewById(R.id.movie_progress)
 
-        val id = intent?.getIntExtra("id", 0) ?: throw IllegalStateException("Id não foi encontrado")
+        val id =
+            intent?.getIntExtra("id", 0) ?: throw IllegalStateException("Id não foi encontrado")
 
-        val url = "https://api.tiagoaguiar.co/netflixapp/movie/$id?apiKey=9207fe2f-8803-4efc-8fbf-9e643ef62888"
+        val url =
+            "https://api.tiagoaguiar.co/netflixapp/movie/$id?apiKey=9207fe2f-8803-4efc-8fbf-9e643ef62888"
 
         MovieTask(this).execute(url)
 
@@ -63,24 +61,11 @@ class MovieActivity : AppCompatActivity(), MovieTask.Callback {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = null
 
-//        // Busquei o desenhavel (layer-list)
-//        val layerDrawable : LayerDrawable = ContextCompat.getDrawable(this, R.drawable.shadows) as LayerDrawable
-//
-//        //busquei o filme que eu quero
-//        val movieCover = ContextCompat.getDrawable(this, R.drawable.movie_4)
-//
-//        //atrabui a esse layer-list o novo filme
-//        layerDrawable.setDrawableByLayerId(R.id.cover_drawable, movieCover)
-//
-//        //set no imageView
-//        val coverImg: ImageView = findViewById(R.id.movie_img)
-//        coverImg.setImageDrawable(layerDrawable)
-
 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home){
+        if (item.itemId == android.R.id.home) {
             finish()
         }
         return super.onOptionsItemSelected(item)
@@ -102,7 +87,10 @@ class MovieActivity : AppCompatActivity(), MovieTask.Callback {
 
         DownloadImageTask(object : DownloadImageTask.Callback {
             override fun onResult(bitmap: Bitmap) {
-                val layerDrawable: LayerDrawable = ContextCompat.getDrawable(this@MovieActivity, R.drawable.shadows) as LayerDrawable
+                val layerDrawable: LayerDrawable = ContextCompat.getDrawable(
+                    this@MovieActivity,
+                    R.drawable.shadows
+                ) as LayerDrawable
                 val movieCover = BitmapDrawable(resources, bitmap)
                 layerDrawable.setDrawableByLayerId(R.id.cover_drawable, movieCover)
                 val coverImg: ImageView = findViewById(R.id.movie_img)

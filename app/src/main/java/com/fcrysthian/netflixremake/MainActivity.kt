@@ -1,19 +1,16 @@
 package com.fcrysthian.netflixremake
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fcrysthian.netflixremake.adapter.CategoryAdapter
-import com.fcrysthian.netflixremake.adapter.MovieAdapter
 import com.fcrysthian.netflixremake.model.Category
-import com.fcrysthian.netflixremake.model.Movie
 import com.fcrysthian.netflixremake.util.CategoryTask
 
 class MainActivity : AppCompatActivity(), CategoryTask.Callback {
@@ -29,14 +26,15 @@ class MainActivity : AppCompatActivity(), CategoryTask.Callback {
 
         progress = findViewById(R.id.progress_main)
 
-        adapter = CategoryAdapter(categories){ id ->
+        adapter = CategoryAdapter(categories) { id ->
             val intent = Intent(this@MainActivity, MovieActivity::class.java)
             intent.putExtra("id", id)
             startActivity(intent)
         }
         val rv: RecyclerView = findViewById(R.id.rv_main)
 //        rv.layoutManager = LinearLayoutManager(this) Rolagem na vertical
-        rv.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false) // rolagem na horizontal
+        rv.layoutManager =
+            LinearLayoutManager(this, RecyclerView.VERTICAL, false) // rolagem na horizontal
         rv.adapter = adapter
 
         CategoryTask(this).execute("https://api.tiagoaguiar.co/netflixapp/home?apiKey=9207fe2f-8803-4efc-8fbf-9e643ef62888")

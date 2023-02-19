@@ -10,7 +10,7 @@ import com.fcrysthian.netflixremake.R
 import com.fcrysthian.netflixremake.model.Movie
 import com.squareup.picasso.Picasso
 
-//Lista Horizonta
+//Lista Horizontal
 class MovieAdapter(
     private val movies: List<Movie>,
     @LayoutRes private val layoutId: Int,

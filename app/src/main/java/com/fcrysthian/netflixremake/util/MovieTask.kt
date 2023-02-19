@@ -1,8 +1,7 @@
-package co.tiagoaguiar.netflixremake.util
+package com.fcrysthian.netflixremake.util
 
 import android.os.Handler
 import android.os.Looper
-import android.telecom.Call
 import android.util.Log
 import com.fcrysthian.netflixremake.model.Movie
 import com.fcrysthian.netflixremake.model.MovieDetail
@@ -12,7 +11,6 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
-import java.nio.Buffer
 import java.util.concurrent.Executors
 import javax.net.ssl.HttpsURLConnection
 
@@ -85,7 +83,7 @@ class MovieTask(private val callback: Callback) {
         }
     }
 
-    private fun toMovieDetail(jsonAsString: String) : MovieDetail {
+    private fun toMovieDetail(jsonAsString: String): MovieDetail {
         val json = JSONObject(jsonAsString)
 
         val id = json.getInt("id")
@@ -110,12 +108,12 @@ class MovieTask(private val callback: Callback) {
         return MovieDetail(movie, similars)
     }
 
-    private fun toString(stream: InputStream) : String {
+    private fun toString(stream: InputStream): String {
         val bytes = ByteArray(1024)
         val baos = ByteArrayOutputStream()
         var read: Int
 
-        while(true) {
+        while (true) {
             read = stream.read(bytes)
             if (read <= 0) {
                 break
