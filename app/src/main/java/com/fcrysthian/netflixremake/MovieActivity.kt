@@ -2,12 +2,16 @@ package com.fcrysthian.netflixremake
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -19,18 +23,29 @@ import com.fcrysthian.netflixremake.adapter.MovieAdapter
 import com.fcrysthian.netflixremake.model.Movie
 import com.fcrysthian.netflixremake.model.MovieDetail
 import com.fcrysthian.netflixremake.util.CategoryTask
+import com.fcrysthian.netflixremake.util.DownloadImageTask
+import com.squareup.picasso.Picasso
 
 class MovieActivity : AppCompatActivity(), MovieTask.Callback {
+
+    private lateinit var txtTitle: TextView
+    private lateinit var txtDesc: TextView
+    private lateinit var txtCast: TextView
+    private lateinit var rv: RecyclerView
+    private lateinit var adapter: MovieAdapter
+    private lateinit var progress: ProgressBar
+    private val movies = mutableListOf<Movie>()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie)
 
-        val txtTitle: TextView = findViewById(R.id.movie_txt_title)
-        val txtDesc: TextView = findViewById(R.id.movie_txt_desc)
-        val txtCast: TextView = findViewById(R.id.movie_txt_cast)
-        val rv : RecyclerView = findViewById(R.id.movie_rv_similar)
+        txtTitle = findViewById(R.id.movie_txt_title)
+        txtDesc = findViewById(R.id.movie_txt_desc)
+        txtCast = findViewById(R.id.movie_txt_cast)
+        rv = findViewById(R.id.movie_rv_similar)
+        progress = findViewById(R.id.movie_progress)
 
         val id = intent?.getIntExtra("id", 0) ?: throw IllegalStateException("Id não foi encontrado")
 
@@ -38,15 +53,9 @@ class MovieActivity : AppCompatActivity(), MovieTask.Callback {
 
         MovieTask(this).execute(url)
 
-        txtTitle.text = "Batman Begins"
-        txtDesc.text = "Essa é uma descrição do filme"
-        txtCast.text = getString(R.string.cast, "Ator A, Ator B, Atriz A, Atriz B")
-
-
-        val movies = mutableListOf<Movie>()
-
+        adapter = MovieAdapter(movies, R.layout.movie_item_similar)
         rv.layoutManager = GridLayoutManager(this, 3)
-        rv.adapter = MovieAdapter(movies, R.layout.movie_item_similar)
+        rv.adapter = adapter
 
         val toolbar: Toolbar = findViewById(R.id.movie_toolbar)
         setSupportActionBar(toolbar)
@@ -54,18 +63,18 @@ class MovieActivity : AppCompatActivity(), MovieTask.Callback {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = null
 
-        // Busquei o desenhavel (layer-list)
-        val layerDrawable : LayerDrawable = ContextCompat.getDrawable(this, R.drawable.shadows) as LayerDrawable
-
-        //busquei o filme que eu quero
-        val movieCover = ContextCompat.getDrawable(this, R.drawable.movie_4)
-
-        //atrabui a esse layer-list o novo filme
-        layerDrawable.setDrawableByLayerId(R.id.cover_drawable, movieCover)
-
-        //set no imageView
-        val coverImg: ImageView = findViewById(R.id.movie_img)
-        coverImg.setImageDrawable(layerDrawable)
+//        // Busquei o desenhavel (layer-list)
+//        val layerDrawable : LayerDrawable = ContextCompat.getDrawable(this, R.drawable.shadows) as LayerDrawable
+//
+//        //busquei o filme que eu quero
+//        val movieCover = ContextCompat.getDrawable(this, R.drawable.movie_4)
+//
+//        //atrabui a esse layer-list o novo filme
+//        layerDrawable.setDrawableByLayerId(R.id.cover_drawable, movieCover)
+//
+//        //set no imageView
+//        val coverImg: ImageView = findViewById(R.id.movie_img)
+//        coverImg.setImageDrawable(layerDrawable)
 
 
     }
@@ -78,14 +87,33 @@ class MovieActivity : AppCompatActivity(), MovieTask.Callback {
     }
 
     override fun onPreExecute() {
-
+        progress.visibility = View.VISIBLE
     }
 
     override fun onResult(movieDetail: MovieDetail) {
-        Log.i("teste", movieDetail.toString())
+        progress.visibility = View.GONE
+        txtTitle.text = movieDetail.movie.title
+        txtDesc.text = movieDetail.movie.desc
+        txtCast.text = getString(R.string.cast, movieDetail.movie.cast)
+
+        movies.clear()
+        movies.addAll(movieDetail.similars)
+        adapter.notifyDataSetChanged()
+
+        DownloadImageTask(object : DownloadImageTask.Callback {
+            override fun onResult(bitmap: Bitmap) {
+                val layerDrawable: LayerDrawable = ContextCompat.getDrawable(this@MovieActivity, R.drawable.shadows) as LayerDrawable
+                val movieCover = BitmapDrawable(resources, bitmap)
+                layerDrawable.setDrawableByLayerId(R.id.cover_drawable, movieCover)
+                val coverImg: ImageView = findViewById(R.id.movie_img)
+                coverImg.setImageDrawable(layerDrawable)
+            }
+        }).execute(movieDetail.movie.coverUrl)
+
     }
 
     override fun onFailure(message: String) {
+        progress.visibility = View.GONE
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
